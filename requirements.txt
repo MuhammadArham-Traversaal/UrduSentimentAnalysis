@@ -1,0 +1,13 @@
+unsloth
+torch
+ninja
+einops
+packaging
+xformers
+"flash-attn>=2.6.3"
+pandas
+seaborn
+numpy
+scikit-learn
+matplotlib
+tqdm
