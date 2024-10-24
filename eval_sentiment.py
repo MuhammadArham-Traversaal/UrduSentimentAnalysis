@@ -9,6 +9,7 @@ from sklearn.metrics import confusion_matrix, f1_score, classification_report, a
 import matplotlib.pyplot as plt
 import seaborn as sns
 from constants import INFER_PROMPT_TEMPLATE, SPLIT_ON_TERM
+import os
 
 
 MAX_SEQ_LENGTH = 512  # Choose any! We auto support RoPE Scaling internally!
@@ -121,12 +122,19 @@ def save_cnf_matrix(data, save_path: str = None):
 
 def infer(model_path: str, data_path: str):
     model, tokenizer = load_model(model_path=model_path)
-    data = load_dataset(data_path)
-    data = eval_model(data, model, tokenizer,
+    data = get_data(data_path)
+    data = eval_model(data=data, tokenizer=tokenizer, model=model,
                       prompt_template=INFER_PROMPT_TEMPLATE, split_term=SPLIT_ON_TERM)
 
     get_accuracy(data)
     eval_scores(data, average_method="macro")
     eval_scores(data, average_method="weighted")
     eval_scores(data, average_method="micro")
-    save_cnf_matrix(data, save_path=f"{model_path.split("/")[-1].replace("-", "_")}.png")
+
+    os.makedirs("outputs", exist_ok=True)
+    data.to_csv(
+        f"outputs/{model_path.split('/')[-1].replace('-', '_')}_preds.csv")
+    save_cnf_matrix(
+        data, save_path=f"outputs/{model_path.split('/')[-1].replace('-', '_')}.png")
+    save_cnf_matrix(
+        data, save_path=f"{model_path.split('/')[-1].replace('-', '_')}.png")
